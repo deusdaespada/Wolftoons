@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Wolftoon Design System - Dark Tech Theme */
+
+@layer base {
+  :root {
+    /* Core Colors - Deep Black */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Primary - Orange/Gold */
+    --primary: 38 100% 50%;
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 38 100% 55%;
+
+    /* Secondary - Dark Gray */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 85%;
+
+    /* Muted */
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;
+
+    /* Accent - Orange */
+    --accent: 38 100% 50%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 38 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(38 100% 50%) 0%, hsl(28 100% 45%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 8% / 0.9) 0%, hsl(0 0% 10% / 0.9) 100%);
+    
+    /* Shadows */
+    --shadow-glow: 0 0 20px hsl(38 100% 50% / 0.15);
+    --shadow-glow-lg: 0 0 40px hsl(38 100% 50% / 0.2);
+    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.6);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+  }
+}
+
+@layer components {
+  /* Glow Effects */
+  .glow-primary {
+    box-shadow: 0 0 15px hsl(38 100% 50% / 0.2);
+  }
+
+  .glow-primary-lg {
+    box-shadow: 0 0 30px hsl(38 100% 50% / 0.3);
+  }
+
+  .glow-card {
+    box-shadow: 0 4px 24px hsl(0 0% 0% / 0.6);
+  }
+
+  /* Text Glow */
+  .text-glow {
+    text-shadow: 0 0 10px hsl(38 100% 50% / 0.4);
+  }
+
+  /* Hover Animations */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 24px hsl(38 100% 50% / 0.25);
+  }
+
+  /* Gradient Borders */
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(38 100% 50%), hsl(28 100% 40%));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(0 0% 20%);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
+
+  /* Badge styles */
+  .badge-hot {
+    background: linear-gradient(135deg, hsl(0 80% 50%), hsl(20 90% 55%));
+  }
+
+  .badge-new {
+    background: linear-gradient(135deg, hsl(38 100% 50%), hsl(48 100% 55%));
+  }
+}

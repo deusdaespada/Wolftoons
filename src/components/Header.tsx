@@ -1,166 +1,360 @@
-import { Link } from "react-router-dom";
-import { Search, Menu, User, Shield, Plus, Download, BookMarked, Trophy } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Search, Menu, User, Shield, Plus, BookMarked, Trophy, Crown, X, Home, BookOpen, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import UserDropdown from "@/components/UserDropdown";
 import NotificationDropdown from "@/components/NotificationDropdown";
-
-// Discord icon component
-const DiscordIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-  </svg>
-);
+import BrandLogo from "@/components/BrandLogo";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { user, signOut, isAdmin, isVip } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const isActive = (path: string) => location.pathname === path;
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    setIsSearchOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when sidebar is open
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isSidebarOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsSearchOpen(false);
+    }
+  };
+
+  const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Usuário';
+
+  const navLinks = [
+    { to: "/", label: "Início", icon: Home },
+    { to: "/catalog", label: "Catálogo", icon: BookOpen },
+    { to: "/ranking", label: "Rankings", icon: Trophy },
+    { to: "/vip", label: "VIP", icon: Crown, highlight: true },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 group">
-          <span className="text-2xl">🐺</span>
-          <div className="text-2xl font-display font-semibold text-foreground">
-            Wolftoon
-          </div>
-        </Link>
+    <>
+      <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/40">
+        <div className="container mx-auto flex h-14 items-center justify-between px-4">
+          {/* Logo */}
+          <BrandLogo compact />
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
-            Início
-          </Link>
-          <Link to="/catalog" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
-            Catálogo
-          </Link>
-          {user && (
-            <Link to="/my-list" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
-              <BookMarked className="h-4 w-4" />
-              Minha Lista
-            </Link>
-          )}
-          <Link to="/ranking" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
-            <Trophy className="h-4 w-4" />
-            Ranking
-          </Link>
-          <Link to="/vip" className="text-sm font-medium text-primary hover:text-primary-glow transition-colors">
-            ⭐ VIP
-          </Link>
-          {isAdmin && (
-            <>
-              <Link to="/admin" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
-                <Shield className="h-4 w-4" />
-                Admin
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                  link.highlight
+                    ? isActive(link.to)
+                      ? "bg-primary text-primary-foreground"
+                      : "text-primary hover:bg-primary/10"
+                    : isActive(link.to)
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                <link.icon className="h-4 w-4" />
+                {link.label}
               </Link>
-              <Link to="/admin/create-comic" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
-                <Plus className="h-4 w-4" />
-                Criar Comic
-              </Link>
-            </>
-          )}
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" asChild className="hover:bg-primary/10 hover:text-primary">
-            <Link to="/search">
-              <Search className="h-5 w-5" />
-            </Link>
-          </Button>
-
-          
-          {/* Discord Link */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            asChild 
-            className="hover:bg-[#5865F2]/10 hover:text-[#5865F2]"
-          >
-            <a href="https://discord.gg/6wUg8wssQv" target="_blank" rel="noopener noreferrer">
-              <DiscordIcon className="h-5 w-5" />
-            </a>
-          </Button>
-          
-          {user ? (
-            <>
-              <NotificationDropdown />
-              <UserDropdown />
-            </>
-          ) : (
-            <Button variant="ghost" size="icon" asChild className="hover:bg-primary/10 hover:text-primary">
-              <Link to="/auth">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
-          )}
-
-          {/* Mobile Menu Button */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden hover:bg-primary/10 hover:text-primary"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-border/40 bg-card/95 backdrop-blur">
-          <nav className="container mx-auto flex flex-col space-y-3 px-4 py-4">
-            <Link 
-              to="/" 
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Início
-            </Link>
-            <Link 
-              to="/catalog" 
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Catálogo
-            </Link>
-            <Link 
-              to="/vip" 
-              className="text-sm font-medium text-primary hover:text-primary-glow transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              ⭐ VIP
-            </Link>
+            ))}
             {user && (
-              <Link 
-                to="/my-list" 
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1"
-                onClick={() => setIsMenuOpen(false)}
+              <Link
+                to="/my-list"
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                  isActive("/my-list") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
                 <BookMarked className="h-4 w-4" />
                 Minha Lista
               </Link>
             )}
-            <Link 
-              to="/install" 
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Download className="h-4 w-4" />
-              Instalar App
-            </Link>
+            {isAdmin && (
+              <>
+                <div className="w-px h-5 bg-border mx-1" />
+                <Link
+                  to="/admin"
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                    isActive("/admin") ? "text-accent-purple bg-accent-purple/10" : "text-muted-foreground hover:text-accent-purple hover:bg-accent-purple/5"
+                  }`}
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </Link>
+                <Link
+                  to="/admin/create"
+                  className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-accent-green hover:bg-accent-green/5"
+                >
+                  <Plus className="h-4 w-4" />
+                  Criar
+                </Link>
+              </>
+            )}
           </nav>
+
+          {/* Desktop Search + Actions */}
+          <div className="flex items-center gap-1">
+            {/* Desktop inline search */}
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center relative">
+              <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Buscar..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-44 h-9 pl-9 pr-3 bg-muted/50 border-border/40 text-sm focus:w-64 transition-all duration-300"
+              />
+            </form>
+
+            {/* Mobile search toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 lg:hidden"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
+              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </Button>
+
+            {user ? (
+              <>
+                <NotificationDropdown />
+                {/* Desktop user dropdown - keep existing */}
+                <div className="hidden lg:block">
+                  <Link to="/profile">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10 hover:text-primary">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <Button variant="default" size="sm" asChild className="hidden lg:flex h-9">
+                <Link to="/auth">Entrar</Link>
+              </Button>
+            )}
+
+            {!user && (
+              <Button variant="ghost" size="icon" asChild className="h-9 w-9 lg:hidden">
+                <Link to="/auth">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden h-9 w-9"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile inline search bar */}
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden overflow-hidden border-t border-border/40"
+            >
+              <form onSubmit={handleSearch} className="container mx-auto px-4 py-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Buscar manhwas..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-10 bg-muted/50 border-border/40"
+                  />
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 z-[70] w-72 bg-background border-l border-border/50 flex flex-col lg:hidden"
+            >
+              {/* Sidebar Header */}
+              <div className="flex items-center justify-between p-4 border-b border-border/50">
+                <BrandLogo compact showText={false} className="gap-0" />
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsSidebarOpen(false)}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      link.highlight
+                        ? isActive(link.to)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-primary hover:bg-primary/10"
+                        : isActive(link.to)
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                ))}
+
+                {user && (
+                  <Link
+                    to="/my-list"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      isActive("/my-list") ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    <BookMarked className="h-5 w-5" />
+                    Minha Lista
+                  </Link>
+                )}
+
+                {isAdmin && (
+                  <Link
+                    to="/create"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      isActive("/create") || isActive("/admin/create")
+                        ? "bg-accent-green/15 text-accent-green"
+                        : "text-accent-green hover:bg-accent-green/10"
+                    }`}
+                  >
+                    <Plus className="h-5 w-5" />
+                    Criar Obra
+                  </Link>
+                )}
+              </nav>
+
+              {/* User Section at Bottom */}
+              <div className="border-t border-border/50 p-3 space-y-1">
+                {user ? (
+                  <>
+                    {/* User Info */}
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 transition-all"
+                    >
+                      <div className="h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-semibold text-primary">
+                          {username.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate flex items-center gap-1.5">
+                          {username}
+                          {isVip && <Crown className="h-3.5 w-3.5 text-yellow-500" />}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* Admin Link */}
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-all"
+                      >
+                        <Shield className="h-5 w-5" />
+                        Painel Admin
+                      </Link>
+                    )}
+
+                    {/* Sign Out */}
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsSidebarOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-all w-full"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      Sair
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-all"
+                  >
+                    <User className="h-5 w-5" />
+                    Entrar / Cadastrar
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

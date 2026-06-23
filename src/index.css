@@ -1,152 +1,295 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Wolftoon Design System - Dark Tech Theme */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Wolftoon 3.0 — Premium Dark Glass
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
-    /* Core Colors - Deep Black */
-    --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
+    /* Surfaces */
+    --background:          225 44%  4%;
+    --foreground:            0  0% 98%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
+    --card:                222 47%  8%;
+    --card-foreground:       0  0% 98%;
 
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 95%;
+    --popover:             222 47%  8%;
+    --popover-foreground:    0  0% 98%;
 
-    /* Primary - Orange/Gold */
-    --primary: 38 100% 50%;
-    --primary-foreground: 0 0% 5%;
-    --primary-glow: 38 100% 55%;
+    /* Primary — #2563EB / #3B82F6 */
+    --primary:             221 83% 53%;
+    --primary-foreground:    0  0% 100%;
+    --primary-glow:        217 91% 60%;
 
-    /* Secondary - Dark Gray */
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary:           222 47% 12%;
+    --secondary-foreground:  0  0% 98%;
 
-    /* Muted */
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 50%;
+    /* Accents */
+    --accent-cyan:         190 95% 55%;
+    --accent-purple:       262 83% 65%;
+    --accent-pink:         330 90% 65%;
+    --accent-green:        160 84% 39%;
+    --accent-vip:           45 96% 56%;
 
-    /* Accent - Orange */
-    --accent: 38 100% 50%;
-    --accent-foreground: 0 0% 5%;
+    --muted:               222 30% 14%;
+    --muted-foreground:    220 14% 60%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --accent:              221 83% 53%;
+    --accent-foreground:     0  0% 98%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 10%;
-    --ring: 38 100% 50%;
+    --destructive:           0 84% 60%;
+    --destructive-foreground: 0  0% 100%;
 
-    --radius: 0.5rem;
+    --border:              222 30% 16%;
+    --input:               222 30% 14%;
+    --ring:                221 83% 53%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(38 100% 50%) 0%, hsl(28 100% 45%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 8% / 0.9) 0%, hsl(0 0% 10% / 0.9) 100%);
-    
+    --radius: 1rem;
+
+    /* Sidebar */
+    --sidebar-background:         222 50%  6%;
+    --sidebar-foreground:         220 14% 80%;
+    --sidebar-primary:            221 83% 53%;
+    --sidebar-primary-foreground:   0  0% 100%;
+    --sidebar-accent:             222 47% 12%;
+    --sidebar-accent-foreground:    0  0% 100%;
+    --sidebar-border:             222 30% 14%;
+    --sidebar-ring:               221 83% 53%;
+
+    /* Gradients (for use in JS / inline styles where Tailwind can't reach) */
+    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(217 91% 60%) 100%);
+    --gradient-hero:    linear-gradient(135deg, hsl(221 83% 53% / 0.25) 0%, hsl(262 83% 65% / 0.15) 100%);
+    --gradient-card:    linear-gradient(145deg, hsl(222 47%  9% / 0.95) 0%, hsl(222 47%  7% / 0.98) 100%);
+
     /* Shadows */
-    --shadow-glow: 0 0 20px hsl(38 100% 50% / 0.15);
-    --shadow-glow-lg: 0 0 40px hsl(38 100% 50% / 0.2);
-    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.6);
+    --shadow-glow:     0 0  32px hsl(221 83% 53% / 0.35);
+    --shadow-glow-lg:  0 0  60px hsl(221 83% 53% / 0.40);
+    --shadow-card:     0 10px 40px hsl(225 44%  2% / 0.60);
+    --shadow-elevated: 0 24px 60px hsl(225 44%  2% / 0.55);
   }
 }
+
+/* ─── Base Reset & Globals ──────────────────────────────────────────────────── */
 
 @layer base {
   * {
     @apply border-border;
+    /* Prevent paint from overflowing due to box-shadow on scroll */
+    will-change: auto;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Prevent layout shift from scrollbar appearing/disappearing */
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    /* Two subtle radial glows — fixed so they don't repaint on scroll */
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% -10%, hsl(221 83% 53% / 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, hsl(262 83% 65% / 0.06) 0%, transparent 60%);
+    background-attachment: fixed;
+    /* Improve text rendering on dark backgrounds */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    /* Prevent orphaned single words on narrow viewports */
+    text-wrap: balance;
+  }
+
+  /* Respect user's motion preference globally */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  ::selection {
+    background: hsl(221 83% 53% / 0.35);
+    color: hsl(0 0% 100%);
+  }
+
+  /* Focus visible — keyboard only, not on click */
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
+/* ─── Components ────────────────────────────────────────────────────────────── */
+
 @layer components {
-  /* Glow Effects */
+
+  /* Glows ------------------------------------------------------------------ */
   .glow-primary {
-    box-shadow: 0 0 15px hsl(38 100% 50% / 0.2);
+    box-shadow: 0 0 20px hsl(221 83% 53% / 0.35), 0 0 40px hsl(221 83% 53% / 0.15);
   }
-
   .glow-primary-lg {
-    box-shadow: 0 0 30px hsl(38 100% 50% / 0.3);
+    box-shadow: 0 0 40px hsl(221 83% 53% / 0.45), 0 0 80px hsl(221 83% 53% / 0.20);
   }
-
+  .glow-vip {
+    box-shadow: 0 0 24px hsl(45 96% 56% / 0.45);
+  }
   .glow-card {
-    box-shadow: 0 4px 24px hsl(0 0% 0% / 0.6);
+    box-shadow: 0 12px 40px hsl(225 44% 2% / 0.55), 0 0 0 1px hsl(222 30% 16% / 0.60);
   }
 
-  /* Text Glow */
-  .text-glow {
-    text-shadow: 0 0 10px hsl(38 100% 50% / 0.4);
+  /* Text gradients --------------------------------------------------------- */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(221 83% 53%), hsl(217 91% 60%), hsl(190 95% 55%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-vibrant {
+    background: linear-gradient(90deg, hsl(190 95% 55%), hsl(221 83% 53%), hsl(262 83% 65%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  /* Hover Animations */
+  /* Glass ------------------------------------------------------------------ */
+  .glass {
+    background: hsl(222 47% 8% / 0.60);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid hsl(222 30% 18% / 0.60);
+  }
+  .glass-strong {
+    background: hsl(222 47% 7% / 0.85);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid hsl(222 30% 18% / 0.70);
+  }
+  .glass-vibrant {
+    background: linear-gradient(135deg, hsl(222 47% 9% / 0.80), hsl(221 83% 20% / 0.25));
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid hsl(221 83% 53% / 0.18);
+  }
+
+  /* Hover interactions ----------------------------------------------------- */
+  /*
+   * Using @media (hover: hover) ensures these effects only apply on devices
+   * that actually have a hover pointer (desktops). Touch devices skip them,
+   * which avoids stuck hover states on iOS/Android.
+   */
   .hover-lift {
-    @apply transition-transform duration-300 hover:-translate-y-1;
+    @apply transition-[transform,box-shadow] duration-300;
+  }
+  @media (hover: hover) {
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px hsl(225 44% 2% / 0.60), 0 0 30px hsl(221 83% 53% / 0.18);
+    }
   }
 
   .hover-glow {
-    @apply transition-all duration-300;
+    @apply transition-shadow duration-300;
+  }
+  @media (hover: hover) {
+    .hover-glow:hover {
+      box-shadow: 0 0 32px hsl(221 83% 53% / 0.35);
+    }
   }
 
-  .hover-glow:hover {
-    box-shadow: 0 0 24px hsl(38 100% 50% / 0.25);
+  .hover-scale {
+    @apply transition-transform duration-300;
+  }
+  @media (hover: hover) {
+    .hover-scale:hover {
+      transform: scale(1.04);
+    }
   }
 
-  /* Gradient Borders */
+  /* Gradient border -------------------------------------------------------- */
   .gradient-border {
     position: relative;
     background: hsl(var(--card));
     border-radius: var(--radius);
   }
-
   .gradient-border::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: var(--radius);
     padding: 1px;
-    background: linear-gradient(135deg, hsl(38 100% 50%), hsl(28 100% 40%));
+    background: linear-gradient(135deg, hsl(221 83% 53%), hsl(262 83% 65%), hsl(190 95% 55%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
+    /* Prevent the pseudo from catching pointer events */
+    pointer-events: none;
   }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Decorative lines ------------------------------------------------------- */
+  .neon-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(221 83% 53% / 0.70), transparent);
   }
 
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
+  /* Badges ----------------------------------------------------------------- */
+  .badge-vip {
+    background: linear-gradient(135deg, hsl(45 96% 56%), hsl(38 95% 60%));
+    box-shadow: 0 0 18px hsl(45 96% 56% / 0.40);
+    color: hsl(28 50% 12%);
   }
-
-  ::-webkit-scrollbar-thumb {
-    background: hsl(0 0% 20%);
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary));
-  }
-
-  /* Badge styles */
-  .badge-hot {
-    background: linear-gradient(135deg, hsl(0 80% 50%), hsl(20 90% 55%));
-  }
-
   .badge-new {
-    background: linear-gradient(135deg, hsl(38 100% 50%), hsl(48 100% 55%));
+    background: linear-gradient(135deg, hsl(221 83% 53%), hsl(217 91% 60%));
+    box-shadow: 0 0 14px hsl(221 83% 53% / 0.40);
   }
+  .badge-hot {
+    background: linear-gradient(135deg, hsl(0 84% 60%), hsl(15 90% 55%));
+    box-shadow: 0 0 14px hsl(0 84% 60% / 0.40);
+  }
+
+  /* Scrollbar -------------------------------------------------------------- */
+  ::-webkit-scrollbar         { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track   { background: hsl(225 44% 4%); }
+  ::-webkit-scrollbar-thumb   {
+    background: linear-gradient(180deg, hsl(221 83% 53% / 0.55), hsl(262 83% 65% / 0.45));
+    border-radius: 6px;
+    border: 2px solid hsl(225 44% 4%);
+  }
+  @media (hover: hover) {
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, hsl(221 83% 53%), hsl(217 91% 60%));
+    }
+  }
+
+  /* Section gradient ------------------------------------------------------- */
+  .section-gradient {
+    background: linear-gradient(180deg, transparent, hsl(222 47% 6% / 0.50), transparent);
+  }
+}
+
+/* ─── Utilities ─────────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  .text-balance    { text-wrap: balance; }
+
+  .scrollbar-hide                      { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar   { display: none; }
 }
